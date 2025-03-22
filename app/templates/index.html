@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil Personal con FastAPI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .likes-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .like-item {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .like-item input {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .add-btn {
+            width: auto;
+        }
+
+        .file-upload {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .file-upload-label {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 150px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .file-upload-label:hover {
+            border-color: #3498db;
+        }
+
+        .file-upload-icon {
+            font-size: 40px;
+            color: #95a5a6;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-text {
+            color: #7f8c8d;
+        }
+
+        input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 30px;
+            font-size: 18px;
+            background-color: #2ecc71;
+        }
+
+        .submit-btn:hover {
+            background-color: #27ae60;
+        }
+
+        .response-container {
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+            display: none;
+        }
+
+        .response-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        pre {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: monospace;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mi Perfil Personal</h1>
+        <form id="profile-form" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="username">Nombre de Usuario:</label>
+                <input type="text" id="username" name="username" placeholder="Tu nombre de usuario" required>
+            </div>
+
+            <div class="form-group">
+                <label for="age">Edad:</label>
+                <input type="number" id="age" name="age" placeholder="Tu edad" min="1" max="120" required>
+            </div>
+
+            <div class="form-group">
+                <label>Intereses:</label>
+                <div class="likes-container" id="likes-container">
+                    <div class="like-item">
+                        <input type="text" class="like-input" placeholder="Ej: Música, Deportes, Cocina...">
+                        <button type="button" class="btn add-btn" id="add-like">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Tu Imagen:</label>
+                <div class="file-upload">
+                    <label class="file-upload-label">
+                        <div class="file-upload-icon">📷</div>
+                        <div class="file-upload-text">Haz clic o arrastra una imagen aquí</div>
+                        <input type="file" id="profile-image" name="file" accept="image/*" required>
+                    </label>
+                    <img id="image-preview" class="image-preview" src="" alt="Vista previa">
+                </div>
+            </div>
+
+            <button type="submit" class="btn submit-btn">Enviar Datos</button>
+        </form>
+
+        <div id="response-container" class="response-container">
+            <div class="response-title">Respuesta del servidor:</div>
+            <pre id="response-content"></pre>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Agregar más campos para intereses
+            const addLikeBtn = document.getElementById('add-like');
+            const likesContainer = document.getElementById('likes-container');
+            
+            addLikeBtn.addEventListener('click', function() {
+                const likeItem = document.createElement('div');
+                likeItem.className = 'like-item';
+                likeItem.innerHTML = `
+                    <input type="text" class="like-input" placeholder="Ej: Música, Deportes, Cocina...">
+                    <button type="button" class="btn add-btn remove-like">-</button>
+                `;
+                likesContainer.appendChild(likeItem);
+                
+                // Agregar evento para remover intereses
+                likeItem.querySelector('.remove-like').addEventListener('click', function() {
+                    likesContainer.removeChild(likeItem);
+                });
+            });
+            
+            // Previsualizar imagen
+            const imageInput = document.getElementById('profile-image');
+            const imagePreview = document.getElementById('image-preview');
+            
+            imageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Manejar el envío del formulario
+            const form = document.getElementById('profile-form');
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                try {
+                    // Crear FormData para enviar a la API
+                    const formData = new FormData();
+                    
+                    // Añadir username y age
+                    formData.append('username', document.getElementById('username').value);
+                    formData.append('age', document.getElementById('age').value);
+                    
+                    // Recoger y añadir intereses como cadena separada por comas
+                    const likeInputs = document.querySelectorAll('.like-input');
+                    const interests = Array.from(likeInputs)
+                        .map(input => input.value.trim())
+                        .filter(value => value !== '')
+                        .join(',');
+                    formData.append('interests', interests);
+                    
+                    // Añadir la imagen
+                    const imageFile = document.getElementById('profile-image').files[0];
+                    if (imageFile) {
+                        formData.append('file', imageFile);
+                    }
+                    
+                    // Enviar datos a la API
+                    const response = await fetch('/upload-image/', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Error: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Mostrar respuesta
+                    const responseContainer = document.getElementById('response-container');
+                    const responseContent = document.getElementById('response-content');
+                    responseContent.textContent = JSON.stringify(data, null, 2);
+                    responseContainer.style.display = 'block';
+                    
+                } catch (error) {
+                    console.error('Error al enviar el formulario:', error);
+                    alert('Error al enviar el formulario: ' + error.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+
+## Instalación
+
+1. Clona el repositorio:
+    ```sh
+    git clone 
+    cd 
+    ```
+
+2. Crea un entorno virtual y actívalo:
+    ```sh
+    python -m venv venv
+    source venv/bin/activate  # En Windows: venv\Scripts\activate
+    ```
+
+3. Instala las dependencias:
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+## Uso
+
+1. Inicia la aplicación:
+    ```sh
+    uvicorn app.main:app --reload
+    ```
+
+2. Abre tu navegador y ve a `http://127.0.0.1:8000` para ver la aplicación en funcionamiento.
+
+## Funcionalidades
+
+- Subir una imagen y convertirla en un vector de características.
+- Guardar la imagen en la carpeta estática.
+- Mostrar una vista previa de la imagen subida.
+- Ingresar nombre de usuario, edad e intereses.
+- Procesar y almacenar los datos en un índice Faiss.
+
+## Archivos Principales
+
+- `app/main.py`: Punto de entrada de la aplicación.
+- `app/routes.py`: Define las rutas de la API.
+- `app/utils.py`: Funciones utilitarias para procesar y guardar imágenes.
+- `app/config.py`: Configuración de la aplicación y creación del índice Faiss.
+- `app/models.py`: Funciones para crear y añadir vectores al índice Faiss.
+- `app/templates/index.html`: Plantilla HTML para la interfaz de usuario.
+
+## Requisitos
+
+- Python 3.10 o superior
+- FastAPI
+- Uvicorn
+- OpenCV
+- Faiss
+- Jinja2
+
+## Contribuciones
+
+Las contribuciones son bienvenidas. Por favor, abre un issue o un pull request para discutir cualquier cambio que te gustaría realizar.
+
+## Licencia
+
+Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.
